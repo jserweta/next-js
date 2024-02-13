@@ -77,7 +77,7 @@ export default function LoginForm() {
         )}
 
         <p className={`${lusitana.className} mt-2 w-[100%] text-center`}>
-          If you don't have an account, please{' '}
+          If you don't have an account, please&nbsp;
           <Link href="/register" className="underline">
             Sign Up.
           </Link>
