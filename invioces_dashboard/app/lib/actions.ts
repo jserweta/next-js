@@ -1,11 +1,12 @@
 'use server';
 
 import { sql } from '@vercel/postgres';
-import { signIn } from '@/auth';
+import { getUser, signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -21,6 +22,14 @@ const FormSchema = z.object({
   date: z.string(),
 });
 
+const FormSchemaCreateUser = z.object({
+  id: z.string(),
+  name: z.string().min(1, { message: 'Name is required' }),
+  email: z.string().email(),
+  password: z.string().min(8),
+  passwordConfirm: z.string(),
+});
+
 export type State = {
   errors?: {
     customerId?: string[];
@@ -30,8 +39,25 @@ export type State = {
   message?: string | null;
 };
 
+export type StateSignUp = {
+  errors?: {
+    name?: string[];
+    email?: string[];
+    password?: string[];
+    passwordConfirm?: string[];
+  };
+  message?: string | null;
+};
+
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
+const CreateUser = FormSchemaCreateUser.omit({ id: true }).refine(
+  (data) => data.password === data.passwordConfirm,
+  {
+    message: "Passwords don't match",
+    path: ['passwordConfirm'],
+  },
+);
 
 export async function createInvoice(prevState: State, formData: FormData) {
   // Validate form using Zod
@@ -136,4 +162,49 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+export async function signUp(prevState: StateSignUp, formData: FormData) {
+  // Validate form using Zod
+  const validatedFields = CreateUser.safeParse({
+    name: formData.get('name'),
+    email: formData.get('email'),
+    password: formData.get('password'),
+    passwordConfirm: formData.get('passwordConfirm'),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Sign Up.',
+    };
+  }
+
+  // Prepare data for insertion into the database
+  const { name, email, password } = validatedFields.data;
+
+  const user = await getUser(email);
+  if (user) {
+    return {
+      message: 'User already exists. Try Sign In.',
+    };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    await sql`
+    INSERT INTO users (name, email, password) 
+    VALUES (${name}, ${email}, ${hashedPassword})
+  `;
+  } catch (error) {
+    console.log(error);
+    return {
+      message: 'Database Error: Failed to Create User.',
+    };
+  }
+
+  revalidatePath('/login');
+  redirect('/login');
 }

@@ -7,9 +7,10 @@ import {
   ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { Button } from './button';
+import { Button } from '../button';
 import { useFormState, useFormStatus } from 'react-dom';
-import { authenticate } from '../lib/actions';
+import { authenticate } from '@/app/lib/actions';
+import Link from 'next/link';
 
 export default function LoginForm() {
   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
@@ -62,18 +63,25 @@ export default function LoginForm() {
           </div>
         </div>
         <LoginButton />
-        <div
-          className="flex h-8 items-end space-x-1"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {errorMessage && (
+        {errorMessage && (
+          <div
+            className="flex h-8 items-end space-x-1"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <>
               <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
               <p className="text-sm text-red-500">{errorMessage}</p>
             </>
-          )}
-        </div>
+          </div>
+        )}
+
+        <p className={`${lusitana.className} mt-2 w-[100%] text-center`}>
+          If you don't have an account, please{' '}
+          <Link href="/register" className="underline">
+            Sign Up.
+          </Link>
+        </p>
       </div>
     </form>
   );

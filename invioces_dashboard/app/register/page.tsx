@@ -1,5 +1,5 @@
 import AcmeLogo from '@/app/ui/acme-logo';
-import LoginForm from '@/app/ui/auth/login-form';
+import RegisterForm from '@/app/ui/auth/register-form';
 
 export default function LoginPage() {
   return (
@@ -10,7 +10,7 @@ export default function LoginPage() {
             <AcmeLogo />
           </div>
         </div>
-        <LoginForm />
+        <RegisterForm />
       </div>
     </main>
   );
