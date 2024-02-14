@@ -6,22 +6,34 @@ import {
   KeyIcon,
   ExclamationCircleIcon,
   UserCircleIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from '../button';
 import { useFormState, useFormStatus } from 'react-dom';
 import { signUp } from '@/app/lib/actions';
+import { useState } from 'react';
+import Link from 'next/link';
 
 export default function RegisterForm() {
   const initialState = { message: null, errors: {} };
   const [state, dispatch] = useFormState(signUp, initialState);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={dispatch} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
-        <h1 className={`${lusitana.className} mb-3 text-2xl`}>
+        <h1 className={`${lusitana.className} mb-2 text-2xl`}>
           Create new account.
         </h1>
+        <p className={`${lusitana.className} mb-3 w-[100%]`}>
+          Already have an account,{' '}
+          <Link href="/login" className="underline">
+            Sign In.
+          </Link>
+        </p>
+
         <div className="w-full">
           <div>
             <label
@@ -88,14 +100,28 @@ export default function RegisterForm() {
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 pr-10 text-sm outline-2 placeholder:text-gray-500"
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="Enter password"
                 aria-describedby="password-error"
               />
+
               <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 cursor-pointer text-gray-500 peer-focus:text-gray-900"
+                aria-label={
+                  showPassword ? 'Password Visible' : 'Password Invisible.'
+                }
+                onClick={() => {
+                  setShowPassword((prev) => !prev);
+                }}
+              >
+                {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
+              </button>
             </div>
 
             <div id="password-error" aria-live="polite" aria-atomic="true">
@@ -118,12 +144,26 @@ export default function RegisterForm() {
               <input
                 className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
                 id="passwordConfirm"
-                type="password"
+                type={showPassword ? 'password' : 'text'}
                 name="passwordConfirm"
                 placeholder="Re-enter password"
                 aria-describedby="confirm-password-error"
               />
+
               <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 cursor-pointer text-gray-500 peer-focus:text-gray-900"
+                aria-label={
+                  showPassword ? 'Password Visible' : 'Password Invisible.'
+                }
+                onClick={() => {
+                  setShowPassword((prev) => !prev);
+                }}
+              >
+                {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
+              </button>
             </div>
 
             <div

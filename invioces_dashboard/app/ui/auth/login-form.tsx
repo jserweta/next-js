@@ -5,15 +5,19 @@ import {
   AtSymbolIcon,
   KeyIcon,
   ExclamationCircleIcon,
+  EyeIcon,
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from '../button';
 import { useFormState, useFormStatus } from 'react-dom';
 import { authenticate } from '@/app/lib/actions';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function LoginForm() {
   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form action={dispatch} className="space-y-3">
@@ -21,7 +25,7 @@ export default function LoginForm() {
         <h1 className={`${lusitana.className} mb-3 text-2xl`}>
           Please log in to continue.
         </h1>
-        <div className="w-full">
+        <div className="mb-3 w-full">
           <div>
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
@@ -36,7 +40,6 @@ export default function LoginForm() {
                 type="email"
                 name="email"
                 placeholder="Enter your email address"
-                required
               />
               <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
@@ -52,17 +55,31 @@ export default function LoginForm() {
               <input
                 className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
                 id="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="Enter password"
-                required
-                minLength={6}
               />
+
               <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 cursor-pointer text-gray-500 peer-focus:text-gray-900"
+                aria-label={
+                  showPassword ? 'Password Visible' : 'Password Invisible.'
+                }
+                onClick={() => {
+                  setShowPassword((prev) => !prev);
+                }}
+              >
+                {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
+              </button>
             </div>
           </div>
         </div>
+
         <LoginButton />
+
         {errorMessage && (
           <div
             className="flex h-8 items-end space-x-1"
@@ -76,7 +93,7 @@ export default function LoginForm() {
           </div>
         )}
 
-        <p className={`${lusitana.className} mt-2 w-[100%] text-center`}>
+        <p className={`${lusitana.className} mt-2 w-[100%]`}>
           If you don&apos;t have an account, please{' '}
           <Link href="/register" className="underline">
             Sign Up.
