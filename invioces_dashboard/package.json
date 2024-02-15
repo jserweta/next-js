@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "clear": "node -r dotenv/config ./scripts/clear.js",
     "dev": "next dev",
     "lint": "next lint",
     "prettier": "prettier --write --ignore-unknown .",
