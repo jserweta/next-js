@@ -10,6 +10,7 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
+import { auth } from '@/auth';
 
 export async function fetchRevenue() {
   // Add noStore() here to prevent the response from being cached.
@@ -104,6 +105,9 @@ export async function fetchFilteredInvoices(
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
     const invoices = await sql<InvoicesTable>`
       SELECT
         invoices.id,
@@ -116,11 +120,12 @@ export async function fetchFilteredInvoices(
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       WHERE
+        invoices.user_id = ${userId} AND (
         customers.name ILIKE ${`%${query}%`} OR
         customers.email ILIKE ${`%${query}%`} OR
         invoices.amount::text ILIKE ${`%${query}%`} OR
         invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
+        invoices.status ILIKE ${`%${query}%`})
       ORDER BY invoices.date DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
@@ -186,11 +191,15 @@ export async function fetchInvoiceById(id: string) {
 
 export async function fetchCustomers() {
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
     const data = await sql<CustomerField>`
       SELECT
         id,
         name
       FROM customers
+      WHERE user_id = ${userId}
       ORDER BY name ASC
     `;
 
