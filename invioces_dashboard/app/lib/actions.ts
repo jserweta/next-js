@@ -1,7 +1,7 @@
 'use server';
 
 import { sql } from '@vercel/postgres';
-import { getUser, signIn } from '@/auth';
+import { auth, getUser, signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -82,9 +82,12 @@ export async function createInvoice(prevState: State, formData: FormData) {
   const date = new Date().toISOString().split('T')[0];
 
   try {
+    const session = await auth();
+    const userId = session?.user?.id;
+
     await sql`
-    INSERT INTO invoices (customer_id, amount, status, date) 
-    VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+    INSERT INTO invoices (customer_id, user_id, amount, status, date) 
+    VALUES (${customerId}, ${userId}, ${amountInCents}, ${status}, ${date})
   `;
   } catch (error) {
     return {
