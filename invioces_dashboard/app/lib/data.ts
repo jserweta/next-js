@@ -189,11 +189,8 @@ export async function fetchInvoiceById(id: string) {
   }
 }
 
-export async function fetchCustomers() {
+export async function fetchCustomers(userId: string) {
   try {
-    const session = await auth();
-    const userId = session?.user?.id;
-
     const data = await sql<CustomerField>`
       SELECT
         id,

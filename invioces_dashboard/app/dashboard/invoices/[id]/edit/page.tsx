@@ -3,6 +3,7 @@ import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 import { fetchCustomers, fetchInvoiceById } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
   title: 'Edit invoice',
@@ -10,10 +11,12 @@ export const metadata: Metadata = {
 
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
+  const session = await auth();
+  const userId = session?.user?.id;
 
   const [invoice, customers] = await Promise.all([
     fetchInvoiceById(id),
-    fetchCustomers(),
+    fetchCustomers(userId),
   ]);
 
   if (!invoice) notFound();
