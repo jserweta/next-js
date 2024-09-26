@@ -79,9 +79,9 @@ export default async function AdminDashboard() {
 }
 
 type DashboardCardProps = {
-  title: String;
-  subtitle: String;
-  body: String;
+  title: string;
+  subtitle: string;
+  body: string;
 };
 
 function DashboardCard({ title, subtitle, body }: DashboardCardProps) {

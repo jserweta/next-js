@@ -21,7 +21,7 @@ import {
 import { Appearance, loadStripe } from "@stripe/stripe-js";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 
 type CheckoutFormProps = {
   product: {
@@ -43,18 +43,10 @@ export default function CheckoutForm({
   clientSecret,
 }: CheckoutFormProps) {
   const { resolvedTheme } = useTheme();
-
-  let appearance: Appearance = {
+  const appearance: Appearance = {
     theme: resolvedTheme === "light" ? "stripe" : "night",
     labels: "floating",
   };
-
-  useEffect(() => {
-    appearance = {
-      theme: resolvedTheme === "light" ? "stripe" : "night",
-      labels: "floating",
-    };
-  }, [resolvedTheme]);
 
   return (
     <div className="max-w-5xl w-full mx-auto space-y-8">
